@@ -2,30 +2,24 @@
 
   "description": "Adds a browser action icon to the toolbar. Click the button to choose a beast. The active tab's body content is then replaced with a picture of the chosen beast. See https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Examples#beastify",
   "manifest_version": 2,
-  "name": "Beastify",
+  "name": "Smiths Rolls",
   "version": "1.0",
-  "homepage_url": "https://github.com/mdn/webextensions-examples/tree/master/beastify",
+  "homepage_url": "https://github.com/kmgv/smiths-rolls",
   "icons": {
-    "48": "icons/beasts-48.png"
+    "48": "icons/smith.png"
   },
 
   "permissions": [
     "activeTab"
   ],
 
-  "browser_action": {
-    "default_icon": "icons/beasts-32.png",
-    "theme_icons": [{
-        "light": "icons/beasts-32-light.png",
-        "dark": "icons/beasts-32.png",
-        "size": 32
-    }],
-    "default_title": "Smiths Rolls",
-    "default_popup": "popup/toolbelt.html"
-  },
 
-  "web_accessible_resources": [
-    "beasts/*.jpg"
+  "content_scripts": [
+    {
+      "matches": ["*://app.roll20.net/editor/character/*"],
+      "js": ["/content_scripts/sort.js"],
+      "all_frames": true
+    }
   ]
 
 }

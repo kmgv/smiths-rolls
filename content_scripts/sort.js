@@ -1,4 +1,5 @@
 (function() {
+
   /**
    * Check and set a global guard variable.
    * If this content script is injected into the same page again,
@@ -8,14 +9,6 @@
     return;
   }
   window.hasRun = true;
-
-  function findNodeByTagName(searchSpace, tagName) {
-
-    for (var elem of searchSpace) {
-      if (elem.tagName == tagName.toUpperCase())
-        return elem
-    }
-  }
 
   function transformAbilitiesTables(tables) {
     var abilities = [];
@@ -43,16 +36,16 @@
   }
 
   function sortAbilities(_document){
-    // faster access
-    var $$ = _document.querySelector;
-
     var skillList = findSkillList(_document)
 
+    if (skillList === null) {
+      console.log('no skill list found')
+      return
+    }
 
     // we are interested in first 3 table, rest are additional skills (also in tables :/)
     var tables = skillList.querySelectorAll('table')
     tables = Array.from(tables).slice(0, 3)
-
 
     var abilities = transformAbilitiesTables(tables);
 
@@ -75,18 +68,38 @@
     }
   }
 
-  function onSort(){
-    var iframes = document.querySelectorAll('.characterdialog iframe');
-    for (var iframe of iframes) {
-      sortAbilities(iframe.contentWindow.document);
-    }
+  function observeMutationsAndFireSorting() {
+    var fired = false;
+    var debounceTimeout = null;
+    var debounceTimeoutTime = 100;
+
+    var mutationObserver = new MutationObserver(function(mutations) {
+      mutations.forEach(function(_) {
+        if (fired)
+          return
+
+        if (debounceTimeout != null) {
+          clearTimeout(debounceTimeout)
+        }
+
+        debounceTimeout = setTimeout(function(){
+          fired = true;
+          mutationObserver.disconnect()
+          sortAbilities(document);
+        }, debounceTimeoutTime)
+      });
+    });
+
+    mutationObserver.observe(document.documentElement, {
+      attributes: true,
+      characterData: true,
+      childList: true,
+      subtree: true,
+      attributeOldValue: true,
+      characterDataOldValue: true
+    });
   }
 
-
-  browser.runtime.onMessage.addListener((message) => {
-    if (message.command === "sort") {
-      onSort()
-    }
-  });
+  observeMutationsAndFireSorting();
 
 })();
