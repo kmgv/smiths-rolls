@@ -3,7 +3,7 @@
   "description": "Plugins helps with readeability of roll20's call of cthulhu character's sheet by sorting abilities alphabetically",
   "manifest_version": 2,
   "name": "Smiths Rolls",
-  "version": "1.1",
+  "version": "1.2",
   "homepage_url": "https://github.com/kmgv/smiths-rolls",
   "icons": {
     "48": "icons/smith.png"
